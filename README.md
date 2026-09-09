@@ -57,3 +57,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Escena del portafolio (septiembre 2026)
+
+La maqueta actual se construye mediante geometría procedural en Three.js. `home.component.ts` controla cámara, iluminación, posprocesado y animación; `voxel-details.ts` agrupa detalles estáticos por color mediante InstancedMesh; `district-environment.ts` define jardines, ampliación del terreno y elementos industriales. No utiliza los modelos de la cafetería anterior.
+
+La navegación permite giro, zoom y restablecer vista. Los paneles HTML actuales muestran presentación, proyectos y contacto; todavía no hay objetos 3D seleccionables. El agua frontal tiene reflejos estilizados y pequeñas ondas animadas; no emplea reflejos reales de la escena. El resplandor usa UnrealBloomPass con OutputPass.
+
+Validación de esta iteración: compilación de desarrollo y comprobación visual de carga y giro en navegador de escritorio. Pendiente: validación de rendimiento y adaptación de la escena en dispositivos móviles, y revisión de compilación de producción antes de publicar.
