@@ -59,10 +59,10 @@ img.action-arrow{display:inline-block;width:20px;height:20px;vertical-align:midd
 @media(max-height:550px) and (orientation:landscape){.island-stage nav{width:auto;gap:6px;max-width:55%;align-items:center}.island-stage nav button{font-size:12px;padding:12px 7px;min-height:44px;white-space:nowrap}.island-stage nav span{margin:0 4px}.island-stage nav button>.action-arrow{display:none}.island-stage nav .cafe-nav{width:44px;height:44px;flex-basis:44px;padding:0}.island-stage aside,.island-stage aside.about-panel,.island-stage aside.projects-panel,.island-stage aside.hobbies-panel{max-height:calc(100% - 185px)}}
 
 /* Keep the breathing room outside the scrollable content. */
-.island-stage aside[class] { display:flex; flex-direction:column; overflow:hidden; padding-block:40px 28px; }
+.island-stage aside.info-panel { display:flex; flex-direction:column; overflow:hidden; padding-block:40px 28px; }
 .panel-scroll { min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#a77735 transparent; padding:4px 10px 8px 4px; margin-inline:-4px -10px; }
 .island-stage aside .close { top:6px; right:10px; z-index:1; }
-@media(max-width:750px) { .island-stage aside[class] { padding-block:40px 22px; } }
+@media(max-width:750px) { .island-stage aside.info-panel { padding-block:40px 22px; } }
 
 
 .sound-toggle { box-sizing:border-box; padding:0; display:grid; place-items:center; }
