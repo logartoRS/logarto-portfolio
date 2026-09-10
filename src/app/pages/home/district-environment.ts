@@ -74,7 +74,7 @@ export function populateDistrict(v: VoxelDetails) {
   v.add(4.8+i*1.15,2.75,1.07,.55,.3,.3,'#a6906d');
  }
  // Organized seating plaza: four legs, two supports, spaced slats and bins.
- for(const [x,z] of [[-7.5,6.5],[7,-7]]){
+ for(const [x,z] of [[-7.5,7.25],[7,-7]]){
   for(const dx of [-.65,.65])for(const dz of [-.22,.22])v.add(x+dx,1.82,z+dz,.1,.52,.1,'#263e48');
   for(let i=0;i<7;i++)v.add(x-.72+i*.24,2.12,z,.21,.12,.65,'#aa9271');
   for(const dx of [-.65,.65])v.add(x+dx,2.3,z+.3,.08,1,.08,'#314b55');

@@ -1,3 +1,6 @@
+import { populateCafeCat } from './cafe-cat';
+import { populateKoi } from './koi';
+import { populateIndustrialPipes } from './industrial-pipes';
 import { language, setLanguage, translate, Language } from './translations';
 import { populateCafeHobbies } from './cafe-hobbies';
 import { TransitionAudio } from './transition-audio';
@@ -72,6 +75,18 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   this.active=section;
  }
  closeSection(){this.active='';if(this.overview){this.moveCamera(this.overview.position,this.overview.target);this.overview=undefined;}}
+ private mobileFrameOffset=0;
+ private updateMobileFraming(){
+  const el=this.container.nativeElement,w=el.clientWidth,h=el.clientHeight;
+  const portrait=w<=750&&h>w;
+  // Shift the optical center, keeping the canvas full-screen behind the sheet.
+  const desired=portrait&&this.active?Math.max(0,h*.5-(80+(h*.6-179))/2):0;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  this.mobileFrameOffset=reduced?desired:THREE.MathUtils.lerp(this.mobileFrameOffset,desired,.12);
+  if(Math.abs(this.mobileFrameOffset-desired)<.1)this.mobileFrameOffset=desired;
+  if(this.mobileFrameOffset>.1)this.camera.setViewOffset(w,h,0,this.mobileFrameOffset,w,h);
+  else if(this.camera.view?.enabled)this.camera.clearViewOffset();
+ }
  private animateCamera(){
   const m=this.cameraMove;if(!m)return;
   const duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?1:1400;
@@ -81,6 +96,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
  }
  @ViewChild('rendererContainer',{static:true}) container!:ElementRef<HTMLDivElement>;
  private updateBillboard: (t:number)=>void = ()=>{};
+ private updateCat:(t:number)=>void=()=>{};
+ private updateKoi:(t:number)=>void=()=>{};
+ private updatePipes:(t:number)=>void=()=>{};
  private updateCafe:(t:number)=>void=()=>{};
  private updatePetals: (t:number)=>void = ()=>{};
  private composer!:EffectComposer; private basin!:THREE.Mesh; private ripples:THREE.Mesh[]=[];
@@ -106,8 +124,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
  this.renderer=new THREE.WebGLRenderer({antialias:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,el.clientWidth<900?1.25:1.75));this.renderer.setSize(el.clientWidth,el.clientHeight);this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.25;el.appendChild(this.renderer.domElement);
  this.controls=new OrbitControls(this.camera,this.renderer.domElement);this.controls.target.set(0,4,0);this.controls.enableDamping=true;this.controls.enablePan=false;this.controls.minDistance=20;this.controls.maxDistance=58;this.controls.maxPolarAngle=Math.PI*.47;
  this.scene.add(new THREE.HemisphereLight('#b9d9ff','#28382e',1.35));const sun=new THREE.DirectionalLight('#c4d7ff',1.5);sun.position.set(-12,24,12);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-22;sun.shadow.camera.right=22;sun.shadow.camera.top=22;sun.shadow.camera.bottom=-22;sun.shadow.normalBias=.04;sun.shadow.radius=3;this.scene.add(sun);const warm=new THREE.DirectionalLight('#ffb278',1.2);warm.position.set(15,8,-8);this.scene.add(warm);
- this.build();this.details.terrain();this.details.architecture();populateDistrict(this.details);populateRearGarden(this.details);populateOfficeGarden(this.details,this.scene);this.updatePetals=populateAlleys(this.details,this.scene);this.details.flush(this.scene);this.atmosphere();this.completeFacades();this.cafeLights();this.contactPanel();this.updateCafe=populateCafeHobbies(this.scene);this.composer=new EffectComposer(this.renderer);this.composer.addPass(new RenderPass(this.scene,this.camera));this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(el.clientWidth,el.clientHeight),.38,.45,1.05));this.composer.addPass(new OutputPass());this.resize=new ResizeObserver(()=>{this.camera.aspect=el.clientWidth/el.clientHeight;this.camera.fov=this.camera.aspect<.8?65:38;this.camera.updateProjectionMatrix();this.renderer.setSize(el.clientWidth,el.clientHeight);this.composer.setSize(el.clientWidth,el.clientHeight)});this.resize.observe(el);
- const animate=()=>{this.frame=requestAnimationFrame(animate);const t=this.clock.getElapsedTime();this.updatePetals(t);this.updateCafe(t);this.updateBillboard(t);this.projectBillboard?.update(t);this.contactBillboard?.update(t);this.fans.forEach(f=>f.rotation.z=t*.8);this.water.position.y=.53+Math.sin(t*.7)*.025;this.animateCamera();this.controls.update();this.ripples.forEach((r,i)=>{r.position.x=r.userData["x"]+Math.sin(t*.5+i)*.1;r.scale.x=.3+Math.sin(t+i)*.12});this.composer.render()};animate();
+ this.build();this.details.terrain();this.details.architecture();populateDistrict(this.details);populateRearGarden(this.details);populateOfficeGarden(this.details,this.scene);this.updatePetals=populateAlleys(this.details,this.scene);this.details.flush(this.scene);this.atmosphere();this.completeFacades();this.cafeLights();this.contactPanel();this.updateCafe=populateCafeHobbies(this.scene);this.updatePipes=populateIndustrialPipes(this.scene);this.updateKoi=populateKoi(this.scene);this.updateCat=populateCafeCat(this.scene);this.composer=new EffectComposer(this.renderer);this.composer.addPass(new RenderPass(this.scene,this.camera));this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(el.clientWidth,el.clientHeight),.38,.45,1.05));this.composer.addPass(new OutputPass());this.resize=new ResizeObserver(()=>{this.camera.aspect=el.clientWidth/el.clientHeight;this.camera.fov=this.camera.aspect<.8?65:38;this.camera.updateProjectionMatrix();this.renderer.setSize(el.clientWidth,el.clientHeight);this.composer.setSize(el.clientWidth,el.clientHeight)});this.resize.observe(el);
+ const animate=()=>{this.frame=requestAnimationFrame(animate);const t=this.clock.getElapsedTime();this.updatePetals(t);this.updateCafe(t);this.updatePipes(t);this.updateKoi(t);this.updateCat(t);this.updateBillboard(t);this.projectBillboard?.update(t);this.contactBillboard?.update(t);this.fans.forEach(f=>f.rotation.z=t*.8);this.water.position.y=.53+Math.sin(t*.7)*.025;this.animateCamera();this.controls.update();this.updateMobileFraming();this.ripples.forEach((r,i)=>{r.position.x=r.userData["x"]+Math.sin(t*.5+i)*.1;r.scale.x=.3+Math.sin(t+i)*.12});this.composer.render()};animate();
  }
  private mat(color:string,glow=false){const key=color+glow;let m=this.materials.get(key);if(!m){m=new THREE.MeshStandardMaterial({color,roughness:.8,metalness:glow?.2:.05,emissive:glow?color:'#000000',emissiveIntensity:glow?4:0});this.materials.set(key,m)}return m}
  private box(x:number,y:number,z:number,w:number,h:number,d:number,c:string,glow=false,parent:THREE.Object3D=this.scene){const m=new THREE.Mesh(this.cube,this.mat(c,glow));m.position.set(x,y,z);m.scale.set(w,h,d);m.castShadow=!glow;m.receiveShadow=true;parent.add(m);return m}
@@ -216,7 +234,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
    const panel=new THREE.Mesh(new THREE.PlaneGeometry(.85,2.75),new THREE.MeshBasicMaterial({map:texture}));panel.position.z=.125;group.add(panel);const back=panel.clone();back.position.z=-.125;back.rotation.y=Math.PI;group.add(back);this.box(.6,1.05,0,.45,.08,.08,'#91a3a5',false,group);this.box(.6,-1.05,0,.45,.08,.08,'#91a3a5',false,group);
    this.box(-.45,0,.13,.035,2.85,.04,color,true,group);
   };
-  sign(-7.65,6,-1,0,'喫茶店','#54d9d9');sign(7.5,4.7,-5.15,-Math.PI/2,'工房','#d98649');
+  sign(-7.65,6,-1,0,'喫茶店','#54d9d9');sign(8.15,4.7,-5.15,-Math.PI/2,'工房','#d98649');
   // Distinct rear service facades: ductwork, louvers and an illuminated workshop sign.
   for(const x of [-3,-2.55]){this.box(x,5.4,-4.73,.23,7,.23,'#8a8275');for(let y=2.2;y<9;y+=1.2)this.box(x,y,-4.73,.34,.1,.34,'#455b65')}
   for(let i=0;i<7;i++)this.box(-4.75,8.05+i*.105,-4.74,1.5,.045,.25,'#8b9c9e');

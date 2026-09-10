@@ -12,19 +12,32 @@ export class VoxelDetails {
   this.batches.get(color)!.push(matrix);
  }
  tree(x:number,y:number,z:number,s=1,pink=false){
-  this.add(x,y+.015,z,1.02*s,.03,.92*s,'#695a42');
-  this.add(x,y+1.2*s,z,.55*s,2.4*s,.5*s,'#635744');
-  this.add(x,y+.3*s,z,.73*s,.6*s,.67*s,'#635744');
-  this.add(x+.28*s,y+.75*s,z+.08*s,.25*s,1.1*s,.32*s,'#79664e');
+  const wood=['#514331','#695139','#806445'];
+  const leaf=pink?['#8d422d','#b55833','#cf7743','#e4a365']:['#294f38','#3f7146','#60904e','#8aaa62'];
+  const put=(a:number,b:number,c:number,w:number,h:number,d:number,color:string)=>this.add(x+a*s,y+b*s,z+c*s,w*s,h*s,d*s,color);
+  const seed=Math.sin(x*12+z*7)*3;
+  // Stepped, gently leaning trunk with bark ridges and spreading roots.
+  for(let i=0;i<10;i++){
+   const lean=Math.sin(i*.19+seed)*.14;
+   put(lean,i*.23+.12,0,.43-i*.018,.26,.4-i*.014,wood[i%3]);
+   put(lean+.18,i*.23+.12,.08,.065,.24,.11,wood[(i+1)%3]);
+  }
+  for(let r=0;r<5;r++)for(let j=0;j<4;j++){
+   const angle=r*1.256+seed,dist=.16+j*.14;
+   put(Math.cos(angle)*dist,.12+(3-j)*.035,Math.sin(angle)*dist,.22,.16,.22,wood[r%3]);
+  }
   const cells=new Set<string>();
-  for(let branch=0;branch<4;branch++){
-   const angle=branch*2.4;const cx=x+Math.cos(angle)*.7*s,cz=z+Math.sin(angle)*.7*s;
-   this.add((x+cx)/2,y+1.8*s,(z+cz)/2,.8*s,.35*s,.35*s,'#635744');
-   for(let a=-3;a<=3;a++)for(let b=-2;b<=2;b++)for(let c=-3;c<=3;c++){
-    const noise=Math.sin(a*13+b*27+c*7+branch*31);
-    if(a*a/10+b*b/5+c*c/10 > .9+noise*.2)continue;
-    const gx=Math.round((cx-x)/(.29*s))+a,gy=Math.round((2.4+branch*.18)/.29)+b,gz=Math.round((cz-z)/(.29*s))+c;const key=[gx,gy,gz].join(':');if(cells.has(key))continue;cells.add(key);
-    this.add(x+gx*.24*s,y+gy*.29*s,z+gz*.24*s,.238*s,.288*s,.238*s,(pink&&Math.abs(a*3+b+c)%11!==0?['#99462f','#bb603c','#d6804e','#e8a16b']:['#315b4e','#44765a','#588b65','#76a476'])[Math.abs(a+b+c+branch)%4]);
+  const crowns=[[-.75,2.35,.12,.85],[.62,2.65,.28,.9],[-.12,3.05,-.35,.84],[.12,2.4,-.7,.7]];
+  for(let branch=0;branch<crowns.length;branch++){
+   const [cx,cy,cz,radius]=crowns[branch];
+   for(let j=0;j<7;j++){const t=j/6;put(cx*t,1.45+(cy-1.45)*t,cz*t,.23-t*.08,.24,.22-t*.08,wood[branch%3]);}
+   for(let a=-5;a<=5;a++)for(let b=-3;b<=3;b++)for(let c=-5;c<=5;c++){
+    const noise=Math.sin(a*13+b*27+c*7+branch*31+seed);
+    if((a*.2)**2/radius**2+(b*.2)**2/.32+(c*.2)**2/radius**2>1+noise*.15)continue;
+    const gx=Math.round((cx+a*.2)/.2),gy=Math.round((cy+b*.2)/.2),gz=Math.round((cz+c*.2)/.2);
+    const key=[gx,gy,gz].join(':');if(cells.has(key))continue;cells.add(key);
+    const shade=b>=2?3:b<0?Math.abs(a+c)%2:1+Math.abs(a+c+branch)%3;
+    put(gx*.2,gy*.2,gz*.2,.198,.198,.198,leaf[shade]);
    }
   }
  }

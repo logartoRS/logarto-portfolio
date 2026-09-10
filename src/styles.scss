@@ -5,3 +5,9 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: 'Barlow', sans-serif; }
 button, input, textarea, select { font: inherit; }
+
+@media (hover:hover) and (pointer:fine) {
+  body, button, a, [role='button'], .world canvas, .world canvas:active {
+    cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M6 3.5L25 18L16.5 19.5L12.5 27.5Z' fill='%2317191c' stroke='%23f5f5f5' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 6 4, default !important;
+  }
+}
